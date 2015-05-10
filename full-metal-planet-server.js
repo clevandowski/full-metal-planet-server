@@ -18,14 +18,18 @@ var engine = null;
 
 var ProcessAction = function(playerAction) {
 	if (partie == null) {
-		console.log('ERREUR: Impossible de traiter les actions tant qu\'une partie n\'est pas créée. http://localhost:8080/init');
-		return null;
+		console.log('ERREUR: Impossible de traiter les actions tant qu\'une partie n\'est pas créée.');
+		return {
+			success: false,
+			errorMessages: [ 'Impossible de traiter les actions tant qu\'une partie n\'est pas créée.', 'Appuyer sur F5 pour initialiser la partie' ]
+		};
 	}
 	console.log('current player: ' + JSON.stringify(partie.getPlayer()));
 
 	var actionReport = referee.validatePlayerAction(playerAction, null);
 	if (actionReport.success) {
-		engine.applyPlayerAction(playerAction);
+		actionReport.hashcode = engine.applyPlayerAction(playerAction, actionReport);
+		console.log('ProcessAction - actionReport.nextMaree: ' + actionReport.nextMaree);
 	}
 	return actionReport;
 }
@@ -43,8 +47,8 @@ var ProcessPartieInitialisation = function() {
 			// C'est très important que l'id des joueurs suive l'ordre de 
 			// l'index du tableau car on les indexe par l'id ensuite
 			// TODO N'utiliser que l'id comme identifiant
-			new Player(0, 'Damien'),
-			new Player(1, 'Noémie')
+			new Player(0, 'Damien', 'red'),
+			new Player(1, 'Noémie', 'blue')
 		],
 		pieces: [
 			new Piece(1, fmpConstants.PIECE_TYPE.TANK, 2, 9), 
@@ -62,9 +66,10 @@ var ProcessPartieInitialisation = function() {
 			new Piece(1, fmpConstants.PIECE_TYPE.BARGE, 33, 12, fmpConstants.ORIENTATION.SO)
 		]
 	};
+	// Instanciation partie & consort
 	partie = new Partie(fmpConstants, datas, plateau, tools, fmpCaseService);
 	referee = new Referee(fmpConstants, partie, tools);
-    engine = new Engine(fmpConstants, partie, tools);
+    engine = new Engine(fmpConstants, fmpConstants.REFEREE_RUNTIME_MODE.SERVER, partie, tools);
 	console.log('partie: ' + JSON.stringify(partie.getPlayer()));
 	return datas;
 }
@@ -85,6 +90,9 @@ var RequestListener = function(request, response) {
 	console.log('operation: ' + operation);
 	if (request.method == 'POST'
 		&& operation == '/init') {
+		// **************
+		// Initialisation
+		// **************
 		console.log('/init operation called');
 		request.on('data', function (data) {
 			console.log(JSON.stringify(data));
@@ -97,6 +105,9 @@ var RequestListener = function(request, response) {
 		});
 	} else if (request.method == 'POST'
 		&& operation == '/validate') {
+		// **************
+		// Action
+		// **************
 		var body = '';
 		request.on('data', function (data) {
 			body += data; // body = body + data
@@ -120,10 +131,6 @@ var RequestListener = function(request, response) {
 	  	response.end();
 	  	return;
 	}
-}
-
-var initPartie = function() {
-	
 }
 
 var server = http.createServer(RequestListener);
