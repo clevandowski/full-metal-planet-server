@@ -26,6 +26,9 @@ var ProcessAction = function(playerAction) {
 	}
 	console.log('current player: ' + JSON.stringify(partie.getPlayer()));
 
+	// Appel synchrone
+	// TODO voir pour passer une callback comme ça se fait avec le client
+	// afin d'être parfaitement en harmonie :)
 	var actionReport = referee.validatePlayerAction(playerAction, null);
 	if (actionReport.success) {
 		actionReport.hashcode = engine.applyPlayerAction(playerAction, actionReport);
@@ -51,6 +54,10 @@ var ProcessPartieInitialisation = function() {
 			new Player(1, 'Noémie', 'blue')
 		],
 		pieces: [
+			new Piece(0, fmpConstants.PIECE_TYPE.BASE_CENTER, 7, 14),
+			new Piece(0, fmpConstants.PIECE_TYPE.BASE_TURRET, 7, 13),
+			new Piece(0, fmpConstants.PIECE_TYPE.BASE_TURRET, 6, 15),
+			new Piece(0, fmpConstants.PIECE_TYPE.BASE_TURRET, 8, 15),
 			new Piece(1, fmpConstants.PIECE_TYPE.TANK, 2, 9), 
 			new Piece(1, fmpConstants.PIECE_TYPE.TANK, 3, 9), 
 			// new Piece(2, 1, PIECE_TYPE.TANK, 2, 8), 
@@ -59,9 +66,15 @@ var ProcessPartieInitialisation = function() {
 			new Piece(0, fmpConstants.PIECE_TYPE.TANK, 6, 8), 
 			new Piece(0, fmpConstants.PIECE_TYPE.TANK, 7, 8),
 			new Piece(0, fmpConstants.PIECE_TYPE.TANK, 7, 7),
+			new Piece(1, fmpConstants.PIECE_TYPE.BASE_CENTER, 31, 9),
+			new Piece(1, fmpConstants.PIECE_TYPE.BASE_TURRET, 30, 9),
+			new Piece(1, fmpConstants.PIECE_TYPE.BASE_TURRET, 32, 9),
+			new Piece(1, fmpConstants.PIECE_TYPE.BASE_TURRET, 31, 10),
 			new Piece(1, fmpConstants.PIECE_TYPE.TANK, 33, 11),
 			new Piece(1, fmpConstants.PIECE_TYPE.TANK, 34, 12), 
 			new Piece(1, fmpConstants.PIECE_TYPE.TANK, 34, 13),
+			new Piece(1, fmpConstants.PIECE_TYPE.TANK, 35, 11), 
+			new Piece(1, fmpConstants.PIECE_TYPE.TANK, 35, 12),
 			new Piece(0, fmpConstants.PIECE_TYPE.BARGE, 7, 9, fmpConstants.ORIENTATION.SO),
 			new Piece(1, fmpConstants.PIECE_TYPE.BARGE, 33, 12, fmpConstants.ORIENTATION.SO)
 		]
